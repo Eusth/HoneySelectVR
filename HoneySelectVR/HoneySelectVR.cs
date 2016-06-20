@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using VRGIN.Core;
 using VRGIN.Modes;
 
@@ -60,6 +61,10 @@ namespace HoneySelectVR
         public void OnLevelWasInitialized(int level)
         {
             // Stub
+            if ((VR.Settings as HoneySettings).ApplyShaders && Camera.main)
+            {
+                VR.Camera.CopyFX(Camera.main);
+            }
         }
 
         public void OnLevelWasLoaded(int level)

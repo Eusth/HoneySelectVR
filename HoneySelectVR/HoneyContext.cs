@@ -5,14 +5,21 @@ using VRGIN.Visuals;
 
 namespace HoneySelectVR
 {
+    enum Levels
+    {
+        ADV = 5,
+        ADV2 = 8,
+        Customization = 7
+    }
+
     internal class HoneyContext : IVRManagerContext
     {
         DefaultMaterialPalette _Materials;
-        VRSettings _Settings;
+        HoneySettings _Settings;
         public HoneyContext()
         {
             _Materials = new DefaultMaterialPalette();
-            _Settings = VRSettings.Load<VRSettings>("vr_settings.xml");
+            _Settings = VRSettings.Load<HoneySettings>("vr_settings.xml");
 
             //_Materials.StandardShader = Shader.Find("Marmoset/Specular IBL");
         }
