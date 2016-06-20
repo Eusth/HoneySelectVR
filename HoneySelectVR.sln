@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HoneySelectVR", "HoneySelectVR\HoneySelectVR.csproj", "{DAD3620F-2448-4F8E-9E1E-EBBE10F46BB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VRGIN", "VRGIN\VRGIN\VRGIN.csproj", "{22788A2C-7695-4A6A-A9F0-115AB9A05FD4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Install|Any CPU = Install|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DAD3620F-2448-4F8E-9E1E-EBBE10F46BB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAD3620F-2448-4F8E-9E1E-EBBE10F46BB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAD3620F-2448-4F8E-9E1E-EBBE10F46BB2}.Install|Any CPU.ActiveCfg = Install|Any CPU
+		{DAD3620F-2448-4F8E-9E1E-EBBE10F46BB2}.Install|Any CPU.Build.0 = Install|Any CPU
+		{DAD3620F-2448-4F8E-9E1E-EBBE10F46BB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAD3620F-2448-4F8E-9E1E-EBBE10F46BB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22788A2C-7695-4A6A-A9F0-115AB9A05FD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22788A2C-7695-4A6A-A9F0-115AB9A05FD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22788A2C-7695-4A6A-A9F0-115AB9A05FD4}.Install|Any CPU.ActiveCfg = Release|Any CPU
+		{22788A2C-7695-4A6A-A9F0-115AB9A05FD4}.Install|Any CPU.Build.0 = Release|Any CPU
+		{22788A2C-7695-4A6A-A9F0-115AB9A05FD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22788A2C-7695-4A6A-A9F0-115AB9A05FD4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
