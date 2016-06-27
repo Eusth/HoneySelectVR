@@ -41,22 +41,6 @@ namespace HoneySelectVR
             }
         }
 
-        public string HMDLayer
-        {
-            get
-            {
-                return "Ignore Raycast";
-            }
-        }
-
-        public string[] IgnoredCanvas
-        {
-            get
-            {
-                return new string[] { };
-            }
-        }
-
         public IMaterialPalette Materials
         {
             get
@@ -102,6 +86,14 @@ namespace HoneySelectVR
             get
             {
                 return true;
+            }
+        }
+
+        public string InvisibleLayer
+        {
+            get
+            {
+                return "Ignore Raycast";
             }
         }
     }
