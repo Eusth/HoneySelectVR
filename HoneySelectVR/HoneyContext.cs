@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using VRGIN.Controls.Speech;
 using VRGIN.Core;
 using VRGIN.Visuals;
 
@@ -94,6 +95,14 @@ namespace HoneySelectVR
             get
             {
                 return "Ignore Raycast";
+            }
+        }
+
+        public Type VoiceCommandType
+        {
+            get
+            {
+                return typeof(VoiceCommand);
             }
         }
     }
