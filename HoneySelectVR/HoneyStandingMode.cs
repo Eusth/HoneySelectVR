@@ -50,7 +50,7 @@ namespace HoneySelectVR
             {
                 VR.Camera.Copy(Camera.main);
 
-                MoveToPosition(Camera.main.transform.position, Camera.main.transform.eulerAngles.y);
+                MoveToPosition(Camera.main.transform.position, Camera.main.transform.rotation);
             }
             //VR.Camera.SteamCam.origin.position = -VR.Camera.SteamCam.origin.forward + VR.Camera.SteamCam.origin.position.y * Vector3.up;
 

@@ -15,7 +15,7 @@ namespace HoneySelectVR
         {
             get
             {
-                return new string[] { "HoneySelectTrial_64", "HoneySelectTrial_32" };
+                return new string[] { "HoneySelectTrial_64", "HoneySelectTrial_32", "HoneySelect_64", "HoneySelect_32", "HoneyStudio_32", "HoneyStudio_64" };
             }
         }
 
