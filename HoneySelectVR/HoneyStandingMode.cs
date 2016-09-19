@@ -25,9 +25,14 @@ namespace HoneySelectVR
             base.OnLevel(level);
             VRLog.Info("Level {0}", level);
 
-            if (GameObject.FindObjectOfType<CustomScene>())
+            if (GameObject.FindObjectOfType<ADVScene>())
             {
                 StartCoroutine(PositionForADV());
+            }
+            if(level == 2)
+            {
+                // Title screen
+                StartCoroutine(PositionForTitle());
             }
         }
         public override IEnumerable<Type> Tools
@@ -53,5 +58,15 @@ namespace HoneySelectVR
             //VR.Camera.SteamCam.origin.position = new Vector3(0, 1.4f, 1f);
             //VR.Camera.SteamCam.origin.rotation = Quaternion.LookRotation(-Vector3.forward);
         }
+
+        private IEnumerator PositionForTitle()
+        {
+            yield return new WaitForEndOfFrame();
+
+            MoveToPosition(Vector3.forward *3, Quaternion.LookRotation(-Vector3.forward));
+
+        }
+
+
     }
 }
