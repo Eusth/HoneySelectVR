@@ -10,7 +10,7 @@ namespace HoneySelectVR
     {
         ADV = 5,
         ADV2 = 8,
-        Customization = 7
+        Customization = 20
     }
 
     internal class HoneyContext : IVRManagerContext

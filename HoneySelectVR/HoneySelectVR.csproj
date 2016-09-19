@@ -67,6 +67,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HoneyActor.cs" />
     <Compile Include="HoneyContext.cs" />
     <Compile Include="HoneyInterpreter.cs" />
     <Compile Include="HoneySeatedMode.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="HoneyStandingMode.cs" />
     <Compile Include="PlayTool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TransientHead.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VRGIN\VRGIN\VRGIN.csproj">
@@ -93,9 +95,9 @@
   <Target Name="AfterBuild" Condition="'$(Configuration)' == 'Install'">
     <Message Text="Installing mod..." Importance="normal" />
     <PropertyGroup>
-      <InstallDir>$(registry:HKEY_CURRENT_USER\Software\illusion\HoneySelectTrial@INSTALLDIR)</InstallDir>
+      <InstallDir>$(registry:HKEY_CURRENT_USER\Software\illusion\HoneySelect@INSTALLDIR)</InstallDir>
       <PluginDir>$(InstallDir)Plugins\</PluginDir>
-      <DataDir>$(InstallDir)HoneySelectTrial_64_Data\</DataDir>
+      <DataDir>$(InstallDir)HoneySelect_64_Data\</DataDir>
     </PropertyGroup>
     <ItemGroup>
       <PluginFiles Include="$(OutputPath)*.dll" />
