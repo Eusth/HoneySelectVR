@@ -32,30 +32,26 @@ namespace HoneySelectVR
         {
             base.OnLevel(level);
             VRLog.Info("Level {0}", level);
-            
-            switch(level)
+
+            if (GameObject.FindObjectOfType<ADVScene>())
             {
-                case (int)Levels.ADV:
-                case (int)Levels.ADV2:
-                    StartCoroutine(PositionForADV());
-                  
-                    break;
-                case (int)Levels.Customization:
-                    var bg = FindObjectsOfType<Canvas>().FirstOrDefault(c => c.name == "BackGround");
-                    if(bg)
-                    {
-                        bg.gameObject.SetActive(false);
-                    }
+                StartCoroutine(PositionForADV());
+            }
+            else if(GameObject.FindObjectOfType<CustomScene>()) { 
+                var bg = FindObjectsOfType<Canvas>().FirstOrDefault(c => c.name == "BackGround");
+                if(bg)
+                {
+                    bg.gameObject.SetActive(false);
+                }
 
-                    //Recenter();
-                    //VR.Camera.SteamCam.origin.position = new Vector3(0, 1.4f, 1f);
-                    //VR.Camera.SteamCam.origin.rotation = Quaternion.LookRotation(-Vector3.forward);
+                //Recenter();
+                //VR.Camera.SteamCam.origin.position = new Vector3(0, 1.4f, 1f);
+                //VR.Camera.SteamCam.origin.rotation = Quaternion.LookRotation(-Vector3.forward);
 
-                    //var cc = Camera.main.GetComponent<CameraControl>();
-                    //cc.CameraDir = -Vector3.left;
-                    //cc.TargetPos = Vector3.zero;
-                    //cc.ForceCalculate();
-                    break;
+                //var cc = Camera.main.GetComponent<CameraControl>();
+                //cc.CameraDir = -Vector3.left;
+                //cc.TargetPos = Vector3.zero;
+                //cc.ForceCalculate();
             }
         }
 

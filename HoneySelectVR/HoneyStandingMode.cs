@@ -25,13 +25,9 @@ namespace HoneySelectVR
             base.OnLevel(level);
             VRLog.Info("Level {0}", level);
 
-            switch (level)
+            if (GameObject.FindObjectOfType<CustomScene>())
             {
-                case (int)Levels.ADV:
-                case (int)Levels.ADV2:
-                    StartCoroutine(PositionForADV());
-
-                    break;
+                StartCoroutine(PositionForADV());
             }
         }
         public override IEnumerable<Type> Tools
