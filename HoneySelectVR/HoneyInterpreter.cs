@@ -1,23 +1,26 @@
-﻿using System;
+﻿using Manager;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using VRGIN.Core;
 using VRGIN.Helpers;
+using System.Linq;
 
 namespace HoneySelectVR
 {
     internal class HoneyInterpreter : GameInterpreter
     {
         public HScene Scene;
-        private IList<IActor> _Actors = new List<IActor>();
+        private IList<HoneyActor> _Actors = new List<HoneyActor>();
 
         protected override void OnLevel(int level)
         {
             base.OnLevel(level);
 
-            Scene = InitScene(GameObject.FindObjectOfType<HScene>());
+            Scene = GameObject.FindObjectOfType<HScene>();
+            StartCoroutine(DelayedInit());
         }
 
         protected override void OnUpdate()
@@ -25,34 +28,23 @@ namespace HoneySelectVR
             base.OnUpdate();
         }
 
-        private HScene InitScene(HScene scene)
-        {
-            _Actors.Clear();
-            if(scene)
-            {
-                StartCoroutine(DelayedInit());
-            }
-            return scene;
-        }
-
         IEnumerator DelayedInit()
         {
-            yield return null;
-            yield return null;
-            var charFemaleField = typeof(HScene).GetField("chaFemale", BindingFlags.NonPublic | BindingFlags.Instance);
-            var charMaleField = typeof(HScene).GetField("chaMale", BindingFlags.NonPublic | BindingFlags.Instance);
+            var scene = Singleton<Scene>.Instance;
+            if (!scene)
+                VRLog.Error("No scene");
 
-            var female = charFemaleField.GetValue(Scene) as CharFemale;
-            var male = charMaleField.GetValue(Scene) as CharMale;
+            while(scene.IsNowLoading)
+            {
+                yield return null;
+            }
 
-            if (male)
+            foreach(var actor in GameObject.FindObjectsOfType<CharInfo>())
             {
-                _Actors.Add(new HoneyActor(male));
+                _Actors.Add(new HoneyActor(actor));
             }
-            if (female)
-            {
-                _Actors.Add(new HoneyActor(female));
-            }
+
+            _Actors = _Actors.OrderBy(a => a.Actor.Sex).ToList();
             
             VRLog.Info("Found {0} chars", _Actors.Count);
         }
@@ -62,7 +54,7 @@ namespace HoneySelectVR
         {
             get
             {
-                return _Actors;
+                return _Actors.Cast<IActor>();
             }
         }
 
