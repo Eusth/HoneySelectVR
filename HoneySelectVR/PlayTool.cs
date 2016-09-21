@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Valve.VR;
 using VRGIN.Controls.Tools;
@@ -11,6 +12,7 @@ using VRGIN.Helpers;
 
 namespace HoneySelectVR
 {
+
     public class GaugeCutout : ProtectedBehaviour
     {
         RawImage _RawImage;
@@ -42,16 +44,41 @@ namespace HoneySelectVR
         }
     }
 
+    public class PlayButton
+    {
+        public UnityEngine.Events.UnityEvent OnActivate = new UnityEngine.Events.UnityEvent();
+        public UnityEngine.Events.UnityEvent OnSelect = new UnityEngine.Events.UnityEvent();
+        public UnityEngine.Events.UnityEvent OnUnselect = new UnityEngine.Events.UnityEvent();
+        public int StartAngle;
+        public int Degrees;
+    }
+
     public class PlayTool : Tool
     {
         private const float DOT_PRODUCT_THRESHOLD = 0.7f;
 
         float prevVal;
         float val;
-       
+        
+        enum PlayToolMode
+        {
+            Buttons,
+            Wheel
+        }
+
+        PlayToolMode _Mode = PlayToolMode.Buttons;
+
         private Canvas _Canvas;
 
-
+        private List<PlayButton> _Buttons = new List<PlayButton>();
+        private PlayButton _SelectedButton;
+        private bool IsVisible
+        {
+            get
+            {
+                return _Canvas.gameObject.activeSelf;
+            }
+        }
         public override Texture2D Image
         {
             get
@@ -60,18 +87,48 @@ namespace HoneySelectVR
             }
         }
 
+
         protected override void OnStart()
         {
             base.OnStart();
             Tracking = GetComponent<SteamVR_TrackedObject>();
             CreateCanvas();
-
+            
+            
             UpdateVisibility();
         }
 
         void UpdateVisibility()
         {
-            _Canvas.gameObject.SetActive(Singleton<HScene>.Instance);
+            if (_Canvas)
+            {
+                _Canvas.gameObject.SetActive(Singleton<HScene>.Instance);
+
+                if(IsVisible)
+                {
+                    _Buttons.Clear();
+                    foreach (var stopControl in FindObjectsOfType<SpriteGaugeStopCtrl>())
+                    {
+                        var button = new PlayButton();
+                        var toggle = stopControl.GetComponent<Toggle>();
+                        button.OnSelect.AddListener(delegate { toggle.OnPointerEnter(null); });
+                        button.OnUnselect.AddListener(delegate { toggle.OnPointerExit(null); });
+                        button.OnActivate.AddListener(delegate { toggle.isOn = !toggle.isOn; stopControl.OnChangeValueStopFeel(toggle.isOn); });
+                        button.Degrees = 45;
+
+                        if (stopControl.name.Contains("Female"))
+                        {
+                            button.StartAngle = 270 - 10 - button.Degrees;
+                        }
+                        else
+                        {
+                            button.StartAngle = 270 + 10;
+                        }
+
+                        _Buttons.Add(button);
+                    }
+                }
+            }
         }
 
         protected override void OnEnable()
@@ -99,32 +156,64 @@ namespace HoneySelectVR
 
         protected override void OnFixedUpdate()
         {
-            if (IsTracking)
+            PlayButton selectedButton = null;
+            if (IsTracking && IsVisible)
             {
                 var device = this.Controller;
 
                 var tPadPos = device.GetAxis();
                 var tPadTouch = device.GetTouch(EVRButtonId.k_EButton_SteamVR_Touchpad);
+                var tPadPress = device.GetPress(EVRButtonId.k_EButton_SteamVR_Touchpad);
+                var tPadRelease = device.GetPressUp(EVRButtonId.k_EButton_SteamVR_Touchpad);
+                var triggerState = device.GetAxis(EVRButtonId.k_EButton_Axis1).x;
 
                 if (device.GetTouchDown(EVRButtonId.k_EButton_Axis0))
                 {
                     prevVal = tPadPos.y;
                     val = 0;
                 }
-
-                if (tPadTouch)
+                if (tPadTouch && !tPadRelease)
                 {
                     // Normalize
-                    val += (tPadPos.y - prevVal) * 5;
-                    while (Mathf.Abs(val) >= 1) {
-                        Owner.StartRumble(new RumbleImpulse(200));
-                        VR.Input.Mouse.VerticalScroll(val > 0 ? 1 : -1);
-                        val = val > 0 ? (val - 1) : (val + 1);
+                    var magnitude = tPadPos.magnitude;
+                    if (magnitude < 0.4f)
+                    {
+                        val += (tPadPos.y - prevVal) * 5;
+                        while (Mathf.Abs(val) >= 1)
+                        {
+                            Owner.StartRumble(new RumbleImpulse(200));
+                            VR.Input.Mouse.VerticalScroll(val > 0 ? 1 : -1);
+                            val = val > 0 ? (val - 1) : (val + 1);
+                        }
+                    } else if(magnitude > 0.6f)
+                    {
+                        selectedButton = DetermineSelectedButton(tPadPos);
                     }
 
                     prevVal = tPadPos.y;
                 }
-               
+
+                if (tPadRelease)
+                {
+                    if (_SelectedButton != null)
+                    {
+                        _SelectedButton.OnActivate.Invoke();
+                    }
+                }
+            }
+
+            // Update selected button
+            if (_SelectedButton != selectedButton)
+            {
+                if (_SelectedButton != null)
+                {
+                    _SelectedButton.OnUnselect.Invoke();
+                }
+                _SelectedButton = selectedButton;
+                if (_SelectedButton != null)
+                {
+                    _SelectedButton.OnSelect.Invoke();
+                }
             }
         }
         
@@ -132,6 +221,26 @@ namespace HoneySelectVR
         {
         }
 
+        private PlayButton DetermineSelectedButton(Vector2 touchPosition)
+        {
+            PlayButton selectedButton = null;
+            if(touchPosition.magnitude > 0.3f)
+            {
+                var normalized = touchPosition.normalized;
+                var currentPoint = Mathf.Atan2(normalized.y, normalized.x) * Mathf.Rad2Deg;
+                while (currentPoint < 0) currentPoint += 360;
+
+                selectedButton = _Buttons.FirstOrDefault(button => button.StartAngle <= currentPoint && button.StartAngle + button.Degrees >= currentPoint);
+                VRLog.Info("Angle: {0} of {1}", currentPoint, _Buttons.Count);
+                if (selectedButton != null)
+                {
+                    VRLog.Info("Found a button: {0}", selectedButton.GetType().FullName);
+                }
+
+            }
+
+            return selectedButton;
+        }
 
         private void CreateCanvas()
         {
