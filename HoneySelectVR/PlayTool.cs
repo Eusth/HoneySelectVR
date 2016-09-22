@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -53,6 +54,32 @@ namespace HoneySelectVR
         public int Degrees;
     }
 
+    public class SpriteButton : PlayButton
+    {
+        public Button Element { get; private set; }
+        public int Index { get; private set; }
+        public SpriteButton(int index, Button buttonElement)
+        {
+            Element = buttonElement;
+            Index = index;
+
+            OnActivate.AddListener(delegate
+            {
+                Element.onClick.Invoke();
+            });
+
+            OnSelect.AddListener(delegate
+            {
+                Element.OnPointerEnter(null);
+            });
+
+            OnUnselect.AddListener(delegate
+            {
+                Element.OnPointerExit(null);
+            });
+        }
+    }
+
     public class PlayTool : Tool
     {
         private const float DOT_PRODUCT_THRESHOLD = 0.7f;
@@ -60,18 +87,22 @@ namespace HoneySelectVR
         float prevVal;
         float val;
         
-        enum PlayToolMode
-        {
-            Buttons,
-            Wheel
-        }
-
-        PlayToolMode _Mode = PlayToolMode.Buttons;
-
         private Canvas _Canvas;
 
         private List<PlayButton> _Buttons = new List<PlayButton>();
         private PlayButton _SelectedButton;
+        private HSceneSprite _Sprite;
+        private List<int> _CachedActiveButtons = new List<int>();
+        private List<int> _CurrentVisibleButtons = new List<int>();
+        private FieldInfo _LstFinishVisibleField = typeof(HSceneSprite).GetField("lstFinishVisible", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        private float _LastSync = 0;
+
+        private const int MAX_DEGREES_PER_BUTTON = 45;
+
+        // Interval to check buttons (for performance)
+        private float SYNC_INTERVAL = 1;
+
         private bool IsVisible
         {
             get
@@ -103,10 +134,15 @@ namespace HoneySelectVR
             if (_Canvas)
             {
                 _Canvas.gameObject.SetActive(Singleton<HScene>.Instance);
+                var newSprite = FindObjectOfType<HSceneSprite>();
 
-                if(IsVisible)
+                if (IsVisible && newSprite != _Sprite)
                 {
+                    _Sprite = newSprite;
+                    _CachedActiveButtons.Clear();
+                    _CurrentVisibleButtons.Clear();
                     _Buttons.Clear();
+                    _LastSync = 0;
                     foreach (var stopControl in FindObjectsOfType<SpriteGaugeStopCtrl>())
                     {
                         var button = new PlayButton();
@@ -127,8 +163,82 @@ namespace HoneySelectVR
 
                         _Buttons.Add(button);
                     }
+
+                    if (_Sprite)
+                    {
+                        PrepareButtons(_Sprite);
+                    }
+                    
                 }
             }
+        }
+
+        private void SynchronizeButtons()
+        {
+            if (Time.time - _LastSync < SYNC_INTERVAL) return;
+
+            _LastSync = Time.time;
+            if(_CurrentVisibleButtons != null && _CachedActiveButtons != null)
+            {
+                var activeButtons = new List<int>();
+
+                foreach(int buttonIndex in _CurrentVisibleButtons)
+                {
+                    if (_Sprite.categoryFinish.lstButton[buttonIndex].IsActive())
+                    {
+                        activeButtons.Add(buttonIndex);
+                    }
+                }
+               
+                if (!activeButtons.SequenceEqual(_CachedActiveButtons))
+                {
+                    VRLog.Info("Something changed!");
+                    _CachedActiveButtons = new List<int>(activeButtons);
+
+                    // Get on clean grounds
+                    foreach(var b in _Buttons.OfType<SpriteButton>().ToList())
+                    {
+                        _Buttons.Remove(b);
+                        DestroyImmediate(b.Element.gameObject);
+
+                        if(_SelectedButton == b)
+                        {
+                            _SelectedButton = null;
+                        }
+                    }
+
+                    if (_CachedActiveButtons.Count > 0)
+                    {
+                        int range = 180 / _CachedActiveButtons.Count;
+                        int clampedRange = Math.Min(MAX_DEGREES_PER_BUTTON, range);
+                        int i = 0;
+                        foreach (var buttonIndex in _CachedActiveButtons)
+                        {
+                            var clone = GameObject.Instantiate<GameObject>(_Sprite.categoryFinish.lstButton[buttonIndex].gameObject);
+
+                            // Deactivate by default
+                            clone.transform.SetParent(_Canvas.transform, false);
+
+                            var realButton = new SpriteButton(i, clone.GetComponent<Button>());
+                            var center = range * i + (range / 2);
+                            var halfRange = Mathf.RoundToInt(clampedRange * 0.5f);
+
+                            realButton.StartAngle = center - halfRange;
+                            realButton.Degrees = clampedRange;
+                            VRLog.Info("Putting button #{0} to {1} (Count={2}, startAngle={3}, range={4})", realButton.Index, center, _CachedActiveButtons.Count, realButton.StartAngle, range);
+
+                            realButton.Element.transform.localPosition = Quaternion.Euler(0, 0, center) * Vector3.right * 100;
+                            realButton.Element.gameObject.SetActive(true);
+
+                            _Buttons.Add(realButton);
+                            i++;
+                        }
+                    }
+                }
+            } else
+            {
+                VRLog.Info("No values");
+            } 
         }
 
         protected override void OnEnable()
@@ -159,6 +269,8 @@ namespace HoneySelectVR
             PlayButton selectedButton = null;
             if (IsTracking && IsVisible)
             {
+                SynchronizeButtons();
+
                 var device = this.Controller;
 
                 var tPadPos = device.GetAxis();
@@ -217,6 +329,12 @@ namespace HoneySelectVR
             }
         }
         
+
+        private void PrepareButtons(HSceneSprite sprite)
+        {
+            _CurrentVisibleButtons = _LstFinishVisibleField.GetValue(_Sprite) as List<int>;
+        }
+
         protected override void OnDestroy()
         {
         }
@@ -231,11 +349,11 @@ namespace HoneySelectVR
                 while (currentPoint < 0) currentPoint += 360;
 
                 selectedButton = _Buttons.FirstOrDefault(button => button.StartAngle <= currentPoint && button.StartAngle + button.Degrees >= currentPoint);
-                VRLog.Info("Angle: {0} of {1}", currentPoint, _Buttons.Count);
-                if (selectedButton != null)
-                {
-                    VRLog.Info("Found a button: {0}", selectedButton.GetType().FullName);
-                }
+                //VRLog.Info("Angle: {0} of {1}", currentPoint, _Buttons.Count);
+                //if (selectedButton != null)
+                //{
+                //    VRLog.Info("Found a button: {0}", selectedButton.GetType().FullName);
+                //}
 
             }
 
