@@ -4,25 +4,27 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using VRGIN.Core;
+using static Config.VoiceSystem;
 
 namespace HoneySelectVR
 {
     public class HoneyActor : DefaultActor<CharInfo>
     {
         private GameObject _HeadRoot;
-        private TransientHead _Head;
+        public TransientHead Head { get; private set; }
 
         public HoneyActor(CharInfo nativeActor) : base(nativeActor)
         {
-            _Head = nativeActor.gameObject.AddComponent<TransientHead>();
+            Head = nativeActor.gameObject.AddComponent<TransientHead>();
+            //nativeActor.chaBody.asVoice.spatialBlend = 1f;
+            //nativeActor.chaBody.asVoice.spatialize = true;
         }
 
-        private Transform _Eyes;
         public override Transform Eyes
         {
             get
             {
-                return _Head.Eyes;
+                return Head.Eyes;
                 //return Actor.GetReferenceInfo(CharReference.RefObjKey.AP_Nose).transform;
             }
         }
@@ -31,11 +33,11 @@ namespace HoneySelectVR
         {
             get
             {
-                return _Head.Visible;
+                return Head.Visible;
             }
             set
             {
-                _Head.Visible = value;
+                Head.Visible = value;
             }
         }
     }

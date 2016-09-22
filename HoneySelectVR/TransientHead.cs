@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using VRGIN.Core;
+using VRGIN.Helpers;
 
 namespace HoneySelectVR
 {
@@ -46,8 +47,12 @@ namespace HoneySelectVR
 
         protected override void OnStart()
         {
-
             avatar = GetComponent<CharInfo>();
+            Reinitialize();
+        }
+
+        public void Reinitialize()
+        {
             headTransform = GetHead(avatar);
             eyesTransform = GetEyes(avatar);
 
@@ -55,6 +60,7 @@ namespace HoneySelectVR
             m_tongues = root.GetComponentsInChildren<SkinnedMeshRenderer>().Where(renderer => renderer.name.StartsWith("cm_O_tang") || renderer.name == "cf_O_tang").Where(tongue => tongue.enabled).ToArray();
 
         }
+
         public static Transform GetHead(CharInfo human)
         {
             return human.chaBody.objHead.GetComponentsInParent<Transform>().First(t => t.name.StartsWith("c") && t.name.Contains("J_Head"));
@@ -63,12 +69,16 @@ namespace HoneySelectVR
 
         public static Transform GetEyes(CharInfo human)
         {
-            var eyes = human.chaBody.objHead.GetComponentsInChildren<Transform>().FirstOrDefault(t => t.name.StartsWith("c") && t.name.EndsWith("Eye_r_L"));
+            var eyes = human.chaBody.objHeadBone.transform.Descendants().FirstOrDefault(t => t.name.StartsWith("c") && t.name.EndsWith("J_Eye_r_L"));
             if (!eyes)
             {
+                VRLog.Info("Creating eyes");
                 eyes = new GameObject("cm_Eye_r_L").transform;
                 eyes.SetParent(GetHead(human), false);
-                eyes.transform.localPosition = new Vector3(0, 0.17f, 0.05f);
+                eyes.transform.localPosition = new Vector3(0, 0.07f, 0.05f);
+            } else
+            {
+                VRLog.Info("FOund eyes");
             }
             return eyes;
         }
@@ -83,11 +93,17 @@ namespace HoneySelectVR
                     //Console.WriteLine("Enabling {0} renderers", rendererList.Count);
                     foreach (var renderer in rendererList)
                     {
-                        renderer.enabled = true;
+                        if (renderer)
+                        {
+                            renderer.enabled = true;
+                        }
                     }
                     foreach (var renderer in m_tongues)
                     {
-                        renderer.enabled = true;
+                        if (renderer)
+                        {
+                            renderer.enabled = true;
+                        }
                     }
 
                 }

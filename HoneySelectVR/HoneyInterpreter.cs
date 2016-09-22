@@ -13,14 +13,37 @@ namespace HoneySelectVR
     internal class HoneyInterpreter : GameInterpreter
     {
         public HScene Scene;
-        private IList<HoneyActor> _Actors = new List<HoneyActor>();
+        private FieldInfo _FemaleField = typeof(HScene).GetField("chaFemale", BindingFlags.NonPublic | BindingFlags.Instance);
+        private FieldInfo _MaleField = typeof(HScene).GetField("chaMale", BindingFlags.NonPublic | BindingFlags.Instance);
+        private HoneyActor _Female;
+        private HoneyActor _Male;
+
 
         protected override void OnLevel(int level)
         {
             base.OnLevel(level);
 
             Scene = GameObject.FindObjectOfType<HScene>();
-            StartCoroutine(DelayedInit());
+            if (Scene)
+            {
+                StartCoroutine(DelayedInit());
+            } else
+            {
+                _Male = null;
+                _Female = null;
+            }
+        }
+
+        private IEnumerator DelayedInit()
+        {
+            var scene = Singleton<Scene>.Instance;
+            while (_FemaleField.GetValue(Scene) == null)
+            {
+                yield return null;
+            }
+
+            _Male = new HoneyActor(_MaleField.GetValue(Scene) as CharMale);
+            _Female = new HoneyActor(_FemaleField.GetValue(Scene) as CharFemale);
         }
 
         protected override void OnUpdate()
@@ -28,33 +51,22 @@ namespace HoneySelectVR
             base.OnUpdate();
         }
 
-        IEnumerator DelayedInit()
-        {
-            var scene = Singleton<Scene>.Instance;
-            if (!scene)
-                VRLog.Error("No scene");
-
-            while(scene.IsNowLoading)
-            {
-                yield return null;
-            }
-
-            foreach(var actor in GameObject.FindObjectsOfType<CharInfo>())
-            {
-                _Actors.Add(new HoneyActor(actor));
-            }
-
-            _Actors = _Actors.OrderBy(a => a.Actor.Sex).ToList();
-            
-            VRLog.Info("Found {0} chars", _Actors.Count);
-        }
-
-
         public override IEnumerable<IActor> Actors
         {
             get
             {
-                return _Actors.Cast<IActor>();
+
+                foreach(var actor in new HoneyActor[] { _Male, _Female })
+                {
+                    if(actor != null && actor.Actor && actor.Actor.chaBody.eyeLookCtrl)
+                    {
+                        if(!actor.Eyes)
+                        {
+                            actor.Head.Reinitialize();
+                        }
+                        yield return actor;
+                    }
+                }
             }
         }
 
