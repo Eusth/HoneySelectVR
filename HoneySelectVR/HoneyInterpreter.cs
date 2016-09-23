@@ -18,7 +18,6 @@ namespace HoneySelectVR
         private HoneyActor _Female;
         private HoneyActor _Male;
 
-
         protected override void OnLevel(int level)
         {
             base.OnLevel(level);
@@ -49,6 +48,25 @@ namespace HoneySelectVR
         protected override void OnUpdate()
         {
             base.OnUpdate();
+        }
+
+        bool _ExitSceneDetected = false;
+        /// <summary>
+        /// Workaround because ExitScene sets the timeScale to zero, which causes a number of issues with the input.
+        /// </summary>
+        protected override void OnLateUpdate()
+        {
+            base.OnLateUpdate();
+
+            bool exitScene = Singleton<Scene>.Instance.AddSceneName == SceneNames.Exit;
+            if (exitScene != _ExitSceneDetected)
+            {
+                if (exitScene)
+                {
+                    Time.timeScale = 1.0f;
+                }
+                _ExitSceneDetected = exitScene;
+            }
         }
 
         public override IEnumerable<IActor> Actors
