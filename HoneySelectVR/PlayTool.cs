@@ -264,8 +264,10 @@ namespace HoneySelectVR
             UpdateVisibility();
         }
 
-        protected override void OnFixedUpdate()
+        protected override void OnUpdate()
         {
+            base.OnUpdate();
+
             PlayButton selectedButton = null;
             if (IsTracking && IsVisible)
             {

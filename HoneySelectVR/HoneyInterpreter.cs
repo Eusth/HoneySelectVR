@@ -26,49 +26,36 @@ namespace HoneySelectVR
             if (Scene)
             {
                 StartCoroutine(DelayedInit());
-            } else
-            {
-                _Male = null;
-                _Female = null;
             }
+            
+            _Male = null;
+            _Female = null;
+            
         }
-
+    
         private IEnumerator DelayedInit()
         {
-            var scene = Singleton<Scene>.Instance;
-            while (_FemaleField.GetValue(Scene) == null)
-            {
-                yield return null;
-            }
+            yield return null;
+            yield return null;
 
-            _Male = new HoneyActor(_MaleField.GetValue(Scene) as CharMale);
-            _Female = new HoneyActor(_FemaleField.GetValue(Scene) as CharFemale);
+            var characterController = Character.Instance;
+            if(characterController)
+            {
+                var male = characterController.dictMale.Values.FirstOrDefault();
+                var female = characterController.dictFemale.Values.FirstOrDefault();
+
+                if(male)
+                    _Male = new HoneyActor(male);
+                if(female)
+                    _Female = new HoneyActor(female);
+            }
         }
 
         protected override void OnUpdate()
         {
             base.OnUpdate();
         }
-
-        bool _ExitSceneDetected = false;
-        /// <summary>
-        /// Workaround because ExitScene sets the timeScale to zero, which causes a number of issues with the input.
-        /// </summary>
-        protected override void OnLateUpdate()
-        {
-            base.OnLateUpdate();
-
-            bool exitScene = Singleton<Scene>.Instance.AddSceneName == SceneNames.Exit;
-            if (exitScene != _ExitSceneDetected)
-            {
-                if (exitScene)
-                {
-                    Time.timeScale = 1.0f;
-                }
-                _ExitSceneDetected = exitScene;
-            }
-        }
-
+        
         public override IEnumerable<IActor> Actors
         {
             get
