@@ -8,6 +8,7 @@ using VRGIN.Modes;
 using VRGIN.Core;
 using System.Collections;
 using UnityEngine;
+using Manager;
 
 namespace HoneySelectVR
 {
@@ -19,10 +20,11 @@ namespace HoneySelectVR
                 new MultiKeyboardShortcut(new KeyStroke("Ctrl + C"), new KeyStroke("Ctrl + C"), delegate { VR.Manager.SetMode<HoneySeatedMode>(); } )
             });
         }
-
+        
         protected override void OnLevel(int level)
         {
             base.OnLevel(level);
+
             VRLog.Info("Level {0}", level);
 
             if (GameObject.FindObjectOfType<ADVScene>())
@@ -34,7 +36,17 @@ namespace HoneySelectVR
                 // Title screen
                 StartCoroutine(PositionForTitle());
             }
+
         }
+
+        protected override void SyncCameras()
+        {
+            if(Scene.Instance.LoadSceneName != SceneNames.CustomScene)
+            {
+                base.SyncCameras();
+            }
+        }
+
         public override IEnumerable<Type> Tools
         {
             get
