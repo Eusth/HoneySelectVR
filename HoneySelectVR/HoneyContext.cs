@@ -105,5 +105,21 @@ namespace HoneySelectVR
                 return typeof(VoiceCommand);
             }
         }
+
+        public float GuiNearClipPlane
+        {
+            get
+            {
+                return -10f;
+            }
+        }
+
+        public float GuiFarClipPlane
+        {
+            get
+            {
+                return 10000f;
+            }
+        }
     }
 }
