@@ -1,6 +1,7 @@
 ﻿using IllusionPlugin;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -11,6 +12,8 @@ namespace HoneySelectVR
 {
     public class HoneySelectVR : IEnhancedPlugin
     {
+        private const String NEW_DEFAULT_TOKEN = "Plugins\\VR\\.vr2";
+
         public string[] Filter
         {
             get
@@ -41,9 +44,19 @@ namespace HoneySelectVR
 
         public void OnApplicationStart()
         {
-            if (Environment.CommandLine.Contains("--vr"))
-            {
-                VRManager.Create<HoneyInterpreter>(new HoneyContext());
+            if (Environment.CommandLine.Contains("--vr")) {
+                var context = new HoneyContext();
+                var settings = context.Settings as HoneySettings;
+
+                // Enforce new default
+                if(!File.Exists(NEW_DEFAULT_TOKEN)) {
+                    File.Create(NEW_DEFAULT_TOKEN);
+
+                    settings.ApplyShaders = true;
+                    settings.Save();
+                }
+
+                VRManager.Create<HoneyInterpreter>(context);
                 VR.Manager.SetMode<HoneySeatedMode>();
             }
         }

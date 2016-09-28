@@ -10,6 +10,7 @@ namespace HoneySelectVR
     [XmlRoot("Settings")]
     public class HoneySettings : VRSettings
     {
-        public bool ApplyShaders { get; set; }
+        public bool ApplyShaders { get { return _ApplyShaders; } set { _ApplyShaders = value; } }
+        private bool _ApplyShaders = true;
     }
 }
