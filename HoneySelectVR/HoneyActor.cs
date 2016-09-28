@@ -9,29 +9,24 @@ using static Config.VoiceSystem;
 
 namespace HoneySelectVR
 {
-    public class HoneyActor : DefaultActor<CharInfo>
+    public class HoneyActor : DefaultActorBehaviour<CharInfo>
     {
-        private GameObject _HeadRoot;
         public TransientHead Head { get; private set; }
 
-        public HoneyActor(CharInfo nativeActor) : base(nativeActor)
+        private LookTargetController _TargetController;
+
+        protected override void Initialize(CharInfo actor)
         {
-            Head = nativeActor.gameObject.AddComponent<TransientHead>();
+            base.Initialize(actor);
 
-            if (Actor.Sex == 1) // Only females!
-            {
-                var lookAtMe = nativeActor.gameObject.AddComponent<LookAtMeYouCuteLittleThing>();
-                lookAtMe.Actor = this;
-            }
-
-            //nativeActor.chaBody.asVoice.spatialBlend = 1f;
-            //nativeActor.chaBody.asVoice.spatialize = true;
+            Head = actor.gameObject.AddComponent<TransientHead>();
         }
 
         public override Transform Eyes
         {
             get
             {
+          
                 return Head.Eyes;
                 //return Actor.GetReferenceInfo(CharReference.RefObjKey.AP_Nose).transform;
             }
@@ -49,37 +44,58 @@ namespace HoneySelectVR
             }
         }
 
-        private class LookAtMeYouCuteLittleThing : ProtectedBehaviour
+        public bool IsFemale
         {
-            public HoneyActor Actor;
-
-            private LookTargetController _TargetController;
-            private Transform _MainCamera;
-
-            protected override void OnStart()
+            get
             {
-                base.OnStart();
-                _TargetController = LookTargetController.Attach(Actor);
-                _MainCamera = Camera.main.transform;
-            }
-
-            protected override void OnUpdate()
-            {
-                base.OnUpdate();
-
-                var eyeLook = Actor.Actor.chaBody.eyeLookCtrl;
-                var neckLook = Actor.Actor.chaBody.neckLookCtrl;
-
-                if(eyeLook && eyeLook.target == _MainCamera)
-                {
-                    eyeLook.target = _TargetController.Target;
-                }
-
-                if(neckLook && neckLook.target == _MainCamera)
-                {
-                    neckLook.target = _TargetController.Target;
-                }
+                return Actor.Sex == 1;
             }
         }
+
+        protected override void OnStart()
+        {
+            base.OnStart();
+
+            if (IsFemale)
+            {
+                VRLog.Info("Create target controller");
+                _TargetController = LookTargetController.AttachTo(this, gameObject);
+            }
+        }
+
+        protected override void OnLevel(int level)
+        {
+            base.OnLevel(level);
+        }
+
+
+        protected override void OnLateUpdate()
+        {
+            base.OnLateUpdate();
+
+            if (IsFemale)
+            {
+                var eyeLook = Actor.chaBody.eyeLookCtrl;
+                var neckLook = Actor.chaBody.neckLookCtrl;
+                var mainCamera = Camera.main.transform;
+
+                if (mainCamera)
+                {
+                    if (eyeLook && eyeLook.target == mainCamera)
+                    {
+
+                        eyeLook.target = _TargetController.Target;
+                    }
+
+                    if (neckLook && neckLook.target == mainCamera)
+                    {
+
+                        neckLook.target = _TargetController.Target;
+                    }
+                }
+                //UnityHelper.DrawDebugBall(_TargetController.Target);
+            }
+        }
+
     }
 }

@@ -45,8 +45,10 @@ namespace HoneySelectVR
             }
         }
 
-        protected override void OnStart()
+        protected override void OnAwake()
         {
+            base.OnAwake();
+
             avatar = GetComponent<CharInfo>();
             Reinitialize();
         }
