@@ -71,11 +71,11 @@ namespace HoneySelectVR
 
         public static Transform GetEyes(CharInfo human)
         {
-            var eyes = human.chaBody.objHeadBone.transform.Descendants().FirstOrDefault(t => t.name.StartsWith("c") && t.name.EndsWith("J_Eye_r_L"));
+            var eyes = human.chaBody.objHeadBone.transform.Descendants().FirstOrDefault(t => t.name.StartsWith("c") && t.name.EndsWith("J_FaceUp_tz"));
             if (!eyes)
             {
                 VRLog.Info("Creating eyes");
-                eyes = new GameObject("cm_Eye_r_L").transform;
+                eyes = new GameObject("cf_J_FaceUp_tz").transform;
                 eyes.SetParent(GetHead(human), false);
                 eyes.transform.localPosition = new Vector3(0, 0.07f, 0.05f);
             } else

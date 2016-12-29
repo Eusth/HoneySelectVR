@@ -88,7 +88,7 @@ namespace HoneySelectVR
         float val;
         
         private Canvas _Canvas;
-
+        private bool _RiftMode = false;
         private List<PlayButton> _Buttons = new List<PlayButton>();
         private PlayButton _SelectedButton;
         private HSceneSprite _Sprite;
@@ -280,31 +280,40 @@ namespace HoneySelectVR
                 var tPadPress = device.GetPress(EVRButtonId.k_EButton_SteamVR_Touchpad);
                 var tPadRelease = device.GetPressUp(EVRButtonId.k_EButton_SteamVR_Touchpad);
                 var triggerState = device.GetAxis(EVRButtonId.k_EButton_Axis1).x;
+                var currentVal = _RiftMode ? tPadPos.x : tPadPos.y;
 
                 if (device.GetTouchDown(EVRButtonId.k_EButton_Axis0))
                 {
-                    prevVal = tPadPos.y;
+                    prevVal = currentVal;
                     val = 0;
                 }
                 if (tPadTouch && !tPadRelease)
                 {
                     // Normalize
                     var magnitude = tPadPos.magnitude;
-                    if (magnitude < 0.4f)
+                    if (magnitude < 0.4f || (_RiftMode && Mathf.Abs(tPadPos.y) < 0.3f))
                     {
-                        val += (tPadPos.y - prevVal) * 5;
+                        if (_RiftMode)
+                        {
+                            val += currentVal * Time.deltaTime * 10;
+                        }
+                        else
+                        {
+                            val += (currentVal - prevVal) * 5;
+                        }
                         while (Mathf.Abs(val) >= 1)
                         {
                             Owner.StartRumble(new RumbleImpulse(200));
                             VR.Input.Mouse.VerticalScroll(val > 0 ? 1 : -1);
                             val = val > 0 ? (val - 1) : (val + 1);
                         }
-                    } else if(magnitude > 0.6f)
+                    }
+                    if (magnitude > 0.6f || _RiftMode)
                     {
                         selectedButton = DetermineSelectedButton(tPadPos);
                     }
 
-                    prevVal = tPadPos.y;
+                    prevVal = currentVal;
                 }
 
                 if (tPadRelease)
@@ -364,16 +373,33 @@ namespace HoneySelectVR
 
         private void CreateCanvas()
         {
-            var canvas = _Canvas = UnityHelper.CreateGameObjectAsChild("ToolCanvas", FindAttachPosition("trackpad")).gameObject.AddComponent<Canvas>();
-            
+            _RiftMode = false;
+            var attachPoint = FindAttachPosition("trackpad");
+            if(!attachPoint)
+            {
+                attachPoint = FindAttachPosition("x_button", "b_button");
+                _RiftMode = true;
+            }
+            var canvas = _Canvas = UnityHelper.CreateGameObjectAsChild("ToolCanvas", attachPoint).gameObject.AddComponent<Canvas>();
+
+
             canvas.renderMode = RenderMode.WorldSpace;
 
             canvas.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 100);
             canvas.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 100);
 
-            canvas.transform.localPosition = new Vector3(-0.00327f, 0, 0.00327f);
-            canvas.transform.localRotation = Quaternion.Euler(0, 180, 90);
-            canvas.transform.localScale = Vector3.one * 0.0002294636f;
+            if (_RiftMode)
+            {
+                canvas.transform.localPosition = new Vector3(0.007f, 0.007f, 0.001f);
+                canvas.transform.localRotation = Quaternion.Euler(0, 180, 180);
+                canvas.transform.localScale = Vector3.one * 0.0003294636f;
+            }
+            else
+            {
+                canvas.transform.localPosition = new Vector3(-0.00327f, 0, 0.00327f);
+                canvas.transform.localRotation = Quaternion.Euler(0, 180, 90);
+                canvas.transform.localScale = Vector3.one * 0.0002294636f;
+            }
 
             var cutout = UnityHelper.CreateGameObjectAsChild("Cutout", _Canvas.transform).gameObject.AddComponent<GaugeCutout>();
             cutout.GetComponent<RectTransform>().anchorMin = Vector2.zero;

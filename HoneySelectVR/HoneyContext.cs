@@ -121,5 +121,21 @@ namespace HoneySelectVR
                 return 10000f;
             }
         }
+
+        public int IgnoreMask
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
+        public float UnitToMeter
+        {
+            get
+            {
+                return 1.0f;
+            }
+        }
     }
 }

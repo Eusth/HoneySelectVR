@@ -19,9 +19,19 @@ namespace HoneySelectVR
         {
             base.OnLevel(level);
 
-            Scene = GameObject.FindObjectOfType<HScene>();
+            Scene = FindObjectOfType<HScene>();
         }
-    
+
+        public override IActor FindNextActorToImpersonate()
+        {
+            var actors = Actors.ToList();
+            var currentlyImpersonated = FindImpersonatedActor();
+
+            return currentlyImpersonated != null
+                ? actors[(actors.IndexOf(currentlyImpersonated) + 1) % actors.Count]
+                : actors.FirstOrDefault();
+        }
+
         protected override void OnUpdate()
         {
             base.OnUpdate();
@@ -44,7 +54,7 @@ namespace HoneySelectVR
                     AddActor(HoneyActor.Create<HoneyActor>(female));
                 }
             }
-        }
+        }     
 
         private void AddActor(HoneyActor actor)
         {

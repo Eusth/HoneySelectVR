@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using VRGIN.Core;
 using VRGIN.Modes;
 
@@ -55,10 +56,12 @@ namespace HoneySelectVR
                     settings.ApplyShaders = true;
                     settings.Save();
                 }
-
                 VRManager.Create<HoneyInterpreter>(context);
                 VR.Manager.SetMode<HoneySeatedMode>();
+                
             }
+
+
         }
 
         public void OnFixedUpdate()
@@ -88,6 +91,14 @@ namespace HoneySelectVR
         public void OnUpdate()
         {
             // Stub
+
+            for (int i = 0; i < 10; i++)
+            {
+                if (Input.GetKeyDown(KeyCode.Keypad0 + i))
+                {
+                    SceneManager.LoadScene(i);
+                }
+            }
         }
     }
 }
