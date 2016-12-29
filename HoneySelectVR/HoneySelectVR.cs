@@ -58,7 +58,6 @@ namespace HoneySelectVR
                 }
                 VRManager.Create<HoneyInterpreter>(context);
                 VR.Manager.SetMode<HoneySeatedMode>();
-                
             }
 
 
@@ -92,13 +91,13 @@ namespace HoneySelectVR
         {
             // Stub
 
-            for (int i = 0; i < 10; i++)
-            {
-                if (Input.GetKeyDown(KeyCode.Keypad0 + i))
-                {
-                    SceneManager.LoadScene(i);
-                }
-            }
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    if (Input.GetKeyDown(KeyCode.Keypad0 + i))
+            //    {
+            //        SceneManager.LoadScene(i);
+            //    }
+            //}
         }
     }
 }
