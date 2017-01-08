@@ -76,9 +76,12 @@ namespace HoneySelectVR
         public void OnLevelWasInitialized(int level)
         {
             // Stub
-            if ((VR.Settings as HoneySettings).ApplyShaders && Camera.main)
+            if (Environment.CommandLine.Contains("--vr"))
             {
-                VR.Camera.CopyFX(Camera.main);
+                if ((VR.Settings as HoneySettings).ApplyShaders && Camera.main)
+                {
+                    VR.Camera.CopyFX(Camera.main);
+                }
             }
         }
 
