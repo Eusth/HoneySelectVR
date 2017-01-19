@@ -76,6 +76,7 @@
     <Compile Include="HoneyStandingMode.cs" />
     <Compile Include="PlayTool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SoundShim.cs" />
     <Compile Include="TransientHead.cs" />
   </ItemGroup>
   <ItemGroup>

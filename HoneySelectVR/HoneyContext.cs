@@ -126,7 +126,7 @@ namespace HoneySelectVR
         {
             get
             {
-                return 0;
+                return 0;//LayerMask.GetMask(VRGINLayer, GuiLayer);
             }
         }
 

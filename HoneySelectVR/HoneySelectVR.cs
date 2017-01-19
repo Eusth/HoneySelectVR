@@ -58,6 +58,8 @@ namespace HoneySelectVR
                 }
                 VRManager.Create<HoneyInterpreter>(context);
                 VR.Manager.SetMode<HoneySeatedMode>();
+
+                // Stub
             }
 
 
@@ -82,18 +84,46 @@ namespace HoneySelectVR
                 {
                     VR.Camera.CopyFX(Camera.main);
                 }
+
+                //SoundShim.Inject();
+                VoiceShim.Inject();
+
             }
         }
 
         public void OnLevelWasLoaded(int level)
         {
-            // Stub
+    
         }
 
         public void OnUpdate()
         {
             // Stub
 
+            //if(Input.GetKeyUp(KeyCode.Space))
+            //{
+            //    foreach (Transform descendent in GameObject.FindObjectsOfType<Transform>())
+            //    {
+            //        if (descendent.GetComponent<DynamicBone>())
+            //        {
+            //            VRLog.Info("Changing rate of {0} from {1}", descendent.name, typeof(DynamicBone).GetField("m_UpdateRate").GetValue(descendent.GetComponent<DynamicBone>()));
+            //            descendent.GetComponent<DynamicBone>().m_UpdateRate = 90f;
+            //            ;
+            //        }
+            //        if (descendent.GetComponent<DynamicBone_Ver01>())
+            //        {
+            //            VRLog.Info("Changing rate of {0} from {1}", descendent.name, descendent.GetComponent<DynamicBone_Ver01>().m_UpdateRate);
+
+            //            descendent.GetComponent<DynamicBone_Ver01>().m_UpdateRate = 90f;
+            //        }
+            //        if (descendent.GetComponent<DynamicBone_Ver02>())
+            //        {
+            //            VRLog.Info("Changing rate of {0} from {1}", descendent.name, descendent.GetComponent<DynamicBone_Ver02>().UpdateRate);
+
+            //            descendent.GetComponent<DynamicBone_Ver02>().UpdateRate = 90f;
+            //        }
+            //    }
+            //}
             //for (int i = 0; i < 10; i++)
             //{
             //    if (Input.GetKeyDown(KeyCode.Keypad0 + i))
