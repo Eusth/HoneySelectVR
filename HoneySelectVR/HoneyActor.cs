@@ -55,7 +55,7 @@ namespace HoneySelectVR
         protected override void OnStart()
         {
             base.OnStart();
-
+            InitializeDynamicBoneColliders();
             if (IsFemale)
             {
                 VRLog.Info("Create target controller");
@@ -66,6 +66,23 @@ namespace HoneySelectVR
         protected override void OnLevel(int level)
         {
             base.OnLevel(level);
+        }
+
+        private void InitializeDynamicBoneColliders()
+        {
+            // Updating *ALL* objects to be sure
+            foreach (DynamicBone bone in GameObject.FindObjectsOfType<DynamicBone>())
+            {
+                bone.m_UpdateRate = 90f;
+            }
+            foreach (DynamicBone_Ver01 bone in GameObject.FindObjectsOfType<DynamicBone_Ver01>())
+            {
+                bone.m_UpdateRate = 90f;
+            }
+            foreach (DynamicBone_Ver02 bone in GameObject.FindObjectsOfType<DynamicBone_Ver02>())
+            {
+                bone.UpdateRate = 90f;
+            }
         }
 
 
