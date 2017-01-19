@@ -14,6 +14,24 @@ namespace HoneySelectVR
     {
         public HScene Scene;
         private List<HoneyActor> _Actors = new List<HoneyActor>();
+        private Camera _SubCamera;
+
+        protected override void OnStart()
+        {
+            base.OnStart();
+
+            // Create secondary camera
+            //_SubCamera = UnityHelper.CreateGameObjectAsChild("VRGIN_SubCamera", VR.Camera.Origin.transform, true).gameObject.AddComponent<Camera>();
+            //_SubCamera.gameObject.AddComponent<SteamVR_Camera>();
+
+            //var vrCamera = VR.Camera.GetComponent<Camera>();
+            //_SubCamera.cullingMask = VR.Context.IgnoreMask;
+
+            //_SubCamera.clearFlags = CameraClearFlags.Depth;
+            //_SubCamera.nearClipPlane = vrCamera.nearClipPlane;
+            //_SubCamera.farClipPlane = vrCamera.farClipPlane;
+            //_SubCamera.depth = vrCamera.depth + 1;
+        }
 
         protected override void OnLevel(int level)
         {
@@ -74,6 +92,11 @@ namespace HoneySelectVR
             {
                 return _Actors.Cast<IActor>();
             }
+        }
+
+        public override bool IsAllowedEffect(MonoBehaviour effect)
+        {
+            return !effect.GetType().Name.Contains("Bloom") && effect.GetType().Name != "DepthOfField";
         }
 
         //public override bool IsBody(Collider collider)
