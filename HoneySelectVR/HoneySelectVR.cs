@@ -14,6 +14,8 @@ namespace HoneySelectVR
     public class HoneySelectVR : IEnhancedPlugin
     {
         private const String NEW_DEFAULT_TOKEN = "Plugins\\VR\\.vr2";
+        VRConfigEffector _Effector;
+        bool _FXInitialized = false;
 
         public string[] Filter
         {
@@ -58,8 +60,6 @@ namespace HoneySelectVR
                 }
                 VRManager.Create<HoneyInterpreter>(context);
                 VR.Manager.SetMode<HoneySeatedMode>();
-
-                // Stub
             }
 
 
@@ -80,14 +80,16 @@ namespace HoneySelectVR
             // Stub
             if (Environment.CommandLine.Contains("--vr"))
             {
-                if ((VR.Settings as HoneySettings).ApplyShaders && Camera.main)
+                if (!_FXInitialized && (VR.Settings as HoneySettings).ApplyShaders && Camera.main)
                 {
                     VR.Camera.CopyFX(Camera.main);
+                    _Effector = VR.Camera.gameObject.AddComponent<VRConfigEffector>();
+                    _Effector.Reset();
+                    _FXInitialized = true;
                 }
 
                 //SoundShim.Inject();
                 VoiceShim.Inject();
-
             }
         }
 

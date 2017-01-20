@@ -98,7 +98,9 @@ namespace HoneySelectVR
 
         public override bool IsAllowedEffect(MonoBehaviour effect)
         {
-            return !(VR.Settings as HoneySettings).EffectBlacklist.Contains(effect.GetType().Name);
+            var name = effect.GetType().Name;
+
+            return !(VR.Settings as HoneySettings).EffectBlacklist.Contains(name) && name != "ConfigEffector";
         }
 
         //public override bool IsBody(Collider collider)
