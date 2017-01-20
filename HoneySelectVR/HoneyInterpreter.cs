@@ -20,6 +20,8 @@ namespace HoneySelectVR
         {
             base.OnStart();
 
+            //VR.GUI.AddGrabber(new CameraConsumer());
+
             // Create secondary camera
             //_SubCamera = UnityHelper.CreateGameObjectAsChild("VRGIN_SubCamera", VR.Camera.Origin.transform, true).gameObject.AddComponent<Camera>();
             //_SubCamera.gameObject.AddComponent<SteamVR_Camera>();
@@ -96,7 +98,7 @@ namespace HoneySelectVR
 
         public override bool IsAllowedEffect(MonoBehaviour effect)
         {
-            return !effect.GetType().Name.Contains("Bloom") && effect.GetType().Name != "DepthOfField";
+            return !(VR.Settings as HoneySettings).EffectBlacklist.Contains(effect.GetType().Name);
         }
 
         //public override bool IsBody(Collider collider)

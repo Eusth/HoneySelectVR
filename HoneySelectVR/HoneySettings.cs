@@ -12,5 +12,8 @@ namespace HoneySelectVR
     {
         public bool ApplyShaders { get { return _ApplyShaders; } set { _ApplyShaders = value; } }
         private bool _ApplyShaders = true;
+
+        public string[] EffectBlacklist { get { return _EffectBlacklist; } set { _EffectBlacklist = value; } }
+        private string[] _EffectBlacklist = { "BloomAndFlares", "DepthOfField" };
     }
 }
