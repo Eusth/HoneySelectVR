@@ -74,6 +74,7 @@
     <Compile Include="HoneySelectVR.cs" />
     <Compile Include="HoneySettings.cs" />
     <Compile Include="HoneyStandingMode.cs" />
+    <Compile Include="HSceneSpriteDummy.cs" />
     <Compile Include="PlayTool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SoundShim.cs" />

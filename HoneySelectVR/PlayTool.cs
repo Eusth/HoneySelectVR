@@ -100,6 +100,8 @@ namespace HoneySelectVR
 
         private const int MAX_DEGREES_PER_BUTTON = 45;
 
+        public static float LastTouch = 0f;
+
         // Interval to check buttons (for performance)
         private float SYNC_INTERVAL = 1;
 
@@ -289,6 +291,8 @@ namespace HoneySelectVR
                 }
                 if (tPadTouch && !tPadRelease)
                 {
+                    LastTouch = Time.time;
+
                     // Normalize
                     var magnitude = tPadPos.magnitude;
                     if (magnitude < 0.4f || (_RiftMode && Mathf.Abs(tPadPos.y) < 0.3f))

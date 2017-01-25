@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -61,8 +62,6 @@ namespace HoneySelectVR
                 VRManager.Create<HoneyInterpreter>(context);
                 VR.Manager.SetMode<HoneySeatedMode>();
             }
-
-
         }
 
         public void OnFixedUpdate()
@@ -90,12 +89,22 @@ namespace HoneySelectVR
 
                 //SoundShim.Inject();
                 VoiceShim.Inject();
+
+                var scene = GameObject.FindObjectOfType<HScene>();
+                if (scene && scene.sprite)
+                {
+                    var dummy = HSceneSpriteDummy.Create(scene.sprite);
+                    var procs = typeof(HScene).GetField("lstProc", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(scene) as List<ProcBase>;
+                    foreach (var proc in procs)
+                    {
+                        typeof(ProcBase).GetField("sprite", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(proc, dummy);
+                    }
+                }
             }
         }
 
         public void OnLevelWasLoaded(int level)
         {
-    
         }
 
         public void OnUpdate()
