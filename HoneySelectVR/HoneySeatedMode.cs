@@ -20,12 +20,13 @@ namespace HoneySelectVR
         protected override IEnumerable<IShortcut> CreateShortcuts()
         {
             return base.CreateShortcuts().Concat(new IShortcut[] {
-                new MultiKeyboardShortcut(new KeyStroke("Ctrl + C"), new KeyStroke("Ctrl + C"), ChangeModeOnControllersDetected ),
+                new MultiKeyboardShortcut(VR.Settings.Shortcuts.ChangeMode, ChangeModeOnControllersDetected ),
             });
         }
 
         protected override void ChangeModeOnControllersDetected()
         {
+
             VR.Manager.SetMode<HoneyStandingMode>();
         }
         protected override void OnLevel(int level)
