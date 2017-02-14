@@ -7,6 +7,7 @@ using UnityEngine;
 using VRGIN.Core;
 using VRGIN.Helpers;
 using System.Linq;
+using VRGIN.Controls.Tools;
 
 namespace HoneySelectVR
 {
@@ -56,25 +57,33 @@ namespace HoneySelectVR
         {
             base.OnUpdate();
 
+            RefreshActors();
+        }
+        
+
+        private void RefreshActors()
+        {
             // Refresh actors
             _Actors.Clear();
 
             // Males
-            foreach(var male in Character.Instance.dictMale.Values)
+            foreach (var male in Character.Instance.dictMale.Values)
             {
                 if (male.LoadEnd)
                 {
                     AddActor(HoneyActor.Create<HoneyActor>(male));
                 }
             }
-            foreach(var female in Character.Instance.dictFemale.Values)
+
+            // Females
+            foreach (var female in Character.Instance.dictFemale.Values)
             {
                 if (female.LoadEnd)
                 {
                     AddActor(HoneyActor.Create<HoneyActor>(female));
                 }
             }
-        }     
+        }
 
         private void AddActor(HoneyActor actor)
         {
@@ -100,7 +109,7 @@ namespace HoneySelectVR
         {
             var name = effect.GetType().Name;
 
-            return !(VR.Settings as HoneySettings).EffectBlacklist.Contains(name) && name != "ConfigEffector";
+            return !(VR.Settings as HoneySettings).EffectBlacklist.Contains(name) && !name.Contains("ConfigEffector");
         }
 
         //public override bool IsBody(Collider collider)

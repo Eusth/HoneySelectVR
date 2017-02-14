@@ -90,6 +90,7 @@ namespace HoneySelectVR
                 //SoundShim.Inject();
                 VoiceShim.Inject();
 
+                // [PLAY TOOL ANIMATIONS] Ver 1
                 var scene = GameObject.FindObjectOfType<HScene>();
                 if (scene && scene.sprite)
                 {

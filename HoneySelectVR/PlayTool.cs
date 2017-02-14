@@ -292,6 +292,11 @@ namespace HoneySelectVR
                 if (tPadTouch && !tPadRelease)
                 {
                     LastTouch = Time.time;
+                    
+                    // [PLAY TOOL ANIMATIONS] Ver 2
+                    //var oldLockState = Cursor.lockState;
+                    //Cursor.lockState = CursorLockMode.Locked;
+                    //Cursor.lockState = oldLockState;
 
                     // Normalize
                     var magnitude = tPadPos.magnitude;
