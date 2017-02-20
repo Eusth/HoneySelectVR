@@ -104,13 +104,10 @@
     </PropertyGroup>
     <ItemGroup>
       <PluginFiles Include="$(OutputPath)*.dll" />
-      <ImageFiles Include="$(OutputPath)Images\*.*" />
-      <OtherFiles Include="$(OutputPath)Libs\**\*" Exclude="$(OutputPath)Libs\Data\**\*" />
-      <DataFiles Include="$(OutputPath)Libs\Data\**\*" />
+      <PluginFiles Include="$(OutputPath)Plugins\**\*" />
+      <DataFiles Include="$(OutputPath)Data\**\*" />
     </ItemGroup>
-    <Copy SourceFiles="@(PluginFiles)" DestinationFolder="$(PluginDir)" />
-    <Copy SourceFiles="@(ImageFiles)" DestinationFolder="$(PluginDir)Images" />
-    <Copy SourceFiles="@(OtherFiles)" DestinationFolder="$(InstallDir)%(RecursiveDir)" />
+    <Copy SourceFiles="@(PluginFiles)" DestinationFolder="$(PluginDir)%(RecursiveDir)" />
     <Copy SourceFiles="@(DataFiles)" DestinationFolder="$(DataDir)%(RecursiveDir)" />
   </Target>
 </Project>
